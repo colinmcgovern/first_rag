@@ -1,0 +1,122 @@
+[
+  [
+    {
+      "id": "7ab15c40-36ae-4f29-a9cb-18d89f527d54",
+      "source": 1,
+      "content": [
+        {
+          "type": "text",
+          "text": "ll"
+        }
+      ],
+      "reasoningContent": [],
+      "citation": [],
+      "timestamp": "2025-10-02T00:25:56.382Z",
+      "metadata": {
+        "inferenceConfig": {
+          "maxTokenCount": 512,
+          "stopSequences": [],
+          "temperature": 0.7,
+          "topP": 0.9,
+          "guardrailId": "",
+          "guardrailVersion": ""
+        },
+        "modelId": "amazon.nova-micro-v1:0"
+      },
+      "state": "completed",
+      "config": {
+        "isOptimized": false
+      }
+    },
+    {
+      "id": "1d64d519-d317-4cfe-b314-afb0fa0a83ca",
+      "source": 2,
+      "content": [
+        {
+          "type": "text",
+          "text": "It looks like your message got cut off. How can I assist you today? If you have a specific question or need information on a particular topic, feel free to let me know! Whether it's about technology, science, history, or anything else, I'm here to help."
+        }
+      ],
+      "reasoningContent": [],
+      "citation": [],
+      "timestamp": "2025-10-02T00:25:56.384Z",
+      "metadata": {
+        "inferenceConfig": {
+          "maxTokenCount": 512,
+          "stopSequences": [],
+          "temperature": 0.7,
+          "topP": 0.9,
+          "guardrailId": "",
+          "guardrailVersion": ""
+        },
+        "modelId": "amazon.nova-micro-v1:0",
+        "metrics": {
+          "isLoading": false,
+          "latency": 353,
+          "inputTokenCount": 2,
+          "outputTokenCount": 59
+        }
+      },
+      "state": "completed"
+    },
+    {
+      "id": "50d665d4-a812-4134-8c04-ac4b2526abbc",
+      "source": 1,
+      "content": [
+        {
+          "type": "text",
+          "text": "hello"
+        }
+      ],
+      "reasoningContent": [],
+      "citation": [],
+      "timestamp": "2025-10-02T00:26:04.504Z",
+      "metadata": {
+        "inferenceConfig": {
+          "maxTokenCount": 512,
+          "stopSequences": [],
+          "temperature": 0.7,
+          "topP": 0.9,
+          "guardrailId": "",
+          "guardrailVersion": ""
+        },
+        "modelId": "amazon.nova-micro-v1:0"
+      },
+      "state": "completed",
+      "config": {
+        "isOptimized": false
+      }
+    },
+    {
+      "id": "84d65312-442b-4fe8-8e34-becde6ab106a",
+      "source": 2,
+      "content": [
+        {
+          "type": "text",
+          "text": "Hello! How can I assist you today? If you have any questions or need information on a particular topic, just let me know. Whether it's something related to science, technology, history, or anything else, I'm here to help. What can I do for you?"
+        }
+      ],
+      "reasoningContent": [],
+      "citation": [],
+      "timestamp": "2025-10-02T00:26:04.505Z",
+      "metadata": {
+        "inferenceConfig": {
+          "maxTokenCount": 512,
+          "stopSequences": [],
+          "temperature": 0.7,
+          "topP": 0.9,
+          "guardrailId": "",
+          "guardrailVersion": ""
+        },
+        "modelId": "amazon.nova-micro-v1:0",
+        "metrics": {
+          "isLoading": false,
+          "latency": 302,
+          "inputTokenCount": 67,
+          "outputTokenCount": 58
+        }
+      },
+      "state": "completed"
+    }
+  ]
+]
