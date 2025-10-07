@@ -29,14 +29,15 @@ def data_ingestion():
     documents=loader.load()
 
     text_splitter=RecursiveCharacterTextSplitter(
-        chunk_size=10000,
-        chunk_overlap=1000
+        chunk_size=1000,
+        chunk_overlap=200
     )
 
     docs=text_splitter.split_documents(documents)
     return docs
 
 def get_vector_store(docs):
+
     vector_store=FAISS.from_documents(docs, bedrock_embeddings)
     vector_store.save_local("faiss_index")
 
@@ -49,23 +50,30 @@ def get_micro_llm():
     return llm
 
 
-def generate_prompt(context, question):
-    return f"""
-    Use the following context to answer the question. Do not use anything else to answer the question.:
-    {context}
-    The question is: {question}
-    """
+def prompt_lynch(context_docs, question):
 
-def call_llm(docs,user_question):
+    prompt = "The user has the following investment idea:\n"
+    prompt += question + "\n"
+    prompt += "Use the following context from peter lynch's investment books "
+    prompt += "to say why the users investment idea is good and bad.\n"
+    prompt += "\n"
 
-    print("asdf")
-    print(generate_prompt(docs[0].page_content, user_question))
+    doc_iter = 0
+
+    for doc in context_docs:
+        doc_iter = doc_iter + 1
+        prompt += "context " + str(doc_iter) + ":\n"
+        prompt += doc.page_content + "\n"
+
+    return prompt
+
+def call_llm(context_docs,user_question):
 
     payload={
             "messages": [
                 {
                     "role": "user",
-                    "content": [{"text": generate_prompt(docs[0].page_content, user_question)}]
+                    "content": [{"text": prompt_lynch(context_docs, user_question)}]
                 }
             ]
         }
@@ -74,12 +82,7 @@ def call_llm(docs,user_question):
     response=bedrock.invoke_model_with_response_stream(
         body=body,
         modelId=model_id,
-        # accept="application/json",
-        # contentType="application/json"
     )
-    # response_body=json.loads(next(response.get("body")).read())
-    # response_text=response_body['generation']
-    # print(response_text)
     response_text = ""
     for event in response['body']:
         chunk = event.get("chunk")
@@ -94,44 +97,15 @@ def call_llm(docs,user_question):
                 pass  # Keep original chunks if it's not valid JSON
     return response_text
 
-
-# def get_response_llm(llm,vectorstore_faiss,query):
-#     qa = RetrievalQA.from_chain_type(
-#         llm=llm,
-#         chain_type="stuff",
-#         retriever=vectorstore_faiss.as_retriever(
-#             search_type="similarity",
-#             search_kwargs={"k": 3}
-#         ),
-#         return_source_documents=True,
-#     )
-#     result = qa({"query": query})
-#     chunks = [doc.page_content for doc in result["source_documents"]]
-#     return chunks
-
-
-# prompt = PromptTemplate(
-#     input_variables=["context", "question"],
-#     template="""You are an assistant that answers questions based on the given context.
-
-# Context:
-# {context}
-
-# Question:
-# {question}
-
-# Answer:"""
-# )
-
-def get_relevant_answer(llm, vectorstore_faiss, query, k=3):
+def get_relative_docs(llm, vectorstore_faiss, query, k=5):
     # Step 1: Retrieve relevant chunks
     retriever = vectorstore_faiss.as_retriever(search_kwargs={"k": k})
     docs = retriever.get_relevant_documents(query)
     return docs
 
 def main():
-    st.set_page_config("Chat PDF")
-    st.header("Chat with PDF")
+    st.set_page_config("Peter Lynch Investment Strategy", layout="wide")
+    st.header("Peter Lynch Investment Strategy")
 
     user_question = st.text_input("Ask your question here:")
 
@@ -146,14 +120,27 @@ def main():
         
     if st.button("Get Answer"):
         with st.spinner("Getting Answer..."):
-            faiss_index = FAISS.load_local("faiss_index", bedrock_embeddings, allow_dangerous_deserialization=True)
+            faiss_index = FAISS.load_local(
+                "faiss_index",
+                bedrock_embeddings,
+                allow_dangerous_deserialization=True
+            )
             llm=get_micro_llm()
-            st.write(get_relevant_answer(llm,faiss_index,user_question)[0].page_content)
-            #st.write(get_response_llm(llm,faiss_index,user_question)[0].page_content)
-            st.write("-----")
+            # Show relevant context in an expander
+            relevant_docs = get_relative_docs(llm, faiss_index, user_question)
+            for doc in relevant_docs:
+                with st.expander("Relevant Context", expanded=False):
+                    st.write(f"Filename: {doc.metadata.get('source', 'Unknown')}")
+                    st.write(f"Page: {doc.metadata.get('page', 'Unknown')}")
+                    st.write("Content:")
+                    st.write(doc.page_content)
+            
+            with st.expander("Prompt", expanded=False):
+                st.write(prompt_lynch(relevant_docs, user_question))
+
             st.write(
                 call_llm(
-                    get_relevant_answer(llm,faiss_index,user_question),
+                    relevant_docs,
                     user_question
                 )
             )
